@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitScope - {{ report.metadata.repository_name }}</title>
+    <link rel="stylesheet" href="assets/style.css">
+  </head>
+  <body>
+    <div class="layout">
+      <aside class="sidebar">
+        <div class="brand">GitScope</div>
+        <p>Local-first Git repository analytics.</p>
+        <ul class="nav-list">
+          {% for page_key in report.page_order %}
+          <li><a href="#{{ page_key }}">{{ page_key|title }}</a></li>
+          {% endfor %}
+        </ul>
+      </aside>
+
+      <main class="content">
+        <header class="topbar">
+          <div class="headline">
+            <h1>{{ report.metadata.repository_name }}</h1>
+            <p>{{ report.metadata.repository_path }}</p>
+          </div>
+          <div class="filters">
+            <span class="badge">Current branch: {{ report.metadata.current_branch }}</span>
+            <span class="badge">Default branch: {{ report.metadata.default_branch }}</span>
+            <span class="badge">Branch filter: {{ report.metadata.branch or "all reachable history" }}</span>
+            <span class="badge">Since: {{ report.metadata.since or "beginning" }}</span>
+            <span class="badge">Until: {{ report.metadata.until or "latest" }}</span>
+            <span class="badge">Generated: {{ report.metadata.generated_at }}</span>
+          </div>
+        </header>
+
+        {% for page_key in report.page_order %}
+        {% set page = report.pages[page_key] %}
+        <section id="{{ page_key }}" class="page">
+          <div class="page-header">
+            <h2>{{ page_key|title }}</h2>
+            <p>{{ page.metadata.description or page_key|title ~ " analytics" }}</p>
+          </div>
+
+          {% if page.empty_state %}
+          <div class="empty-state">{{ page.empty_state }}</div>
+          {% endif %}
+
+          {% if page.cards %}
+          <div class="card-grid">
+            {% for card in page.cards %}
+            <article class="card">
+              <div class="metric-label">{{ card.label }}</div>
+              <div class="metric-value">{{ card.value }}</div>
+              {% if card.hint %}
+              <div class="metric-hint">{{ card.hint }}</div>
+              {% endif %}
+            </article>
+            {% endfor %}
+          </div>
+          {% endif %}
+
+          {% if page.charts %}
+          <div class="chart-grid">
+            {% for chart in page.charts %}
+            <article class="chart-card">
+              <h3>{{ chart.title }}</h3>
+              <p>{{ chart.description }}</p>
+              <div class="chart-canvas" data-page="{{ page_key }}" data-chart-index="{{ loop.index0 }}"></div>
+            </article>
+            {% endfor %}
+          </div>
+          {% endif %}
+
+          {% if page.tables %}
+          <div class="table-grid">
+            {% for table in page.tables %}
+            <article class="table-card">
+              <h3>{{ table.title }}</h3>
+              {% if table.rows %}
+              <div class="table-wrapper">
+                <table>
+                  <thead>
+                    <tr>
+                      {% for column in table.columns %}
+                      <th>{{ column.replace("_", " ") }}</th>
+                      {% endfor %}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for row in table.rows %}
+                    <tr>
+                      {% for column in table.columns %}
+                      {% set value = row[column] %}
+                      <td class="{% if column in ['commits', 'additions', 'deletions', 'files_modified', 'ahead', 'behind', 'size', 'changed_files', 'changes', 'average_commit_size'] %}numeric{% elif column == 'path' %}path{% endif %}">
+                        {% if column == 'status' %}
+                        <span class="status-list">
+                          {% for status in value.split(', ') %}
+                          <span class="status-pill {{ status }}">{{ status }}</span>
+                          {% endfor %}
+                        </span>
+                        {% else %}
+                        {{ value }}
+                        {% endif %}
+                      </td>
+                      {% endfor %}
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+              {% else %}
+              <p>{{ table.empty_message }}</p>
+              {% endif %}
+            </article>
+            {% endfor %}
+          </div>
+          {% endif %}
+        </section>
+        {% endfor %}
+
+        <footer class="footer">
+          Report data is also available in <code>report.json</code>. The normalized SQLite cache for this run is stored at <code>.gitscope/analysis.sqlite3</code>.
+        </footer>
+      </main>
+    </div>
+
+    <script>
+      window.GITSCOPE_REPORT = {{ report|tojson }};
+    </script>
+    <script src="assets/app.js"></script>
+  </body>
+</html>
