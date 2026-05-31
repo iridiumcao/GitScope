@@ -77,12 +77,13 @@ Reasons:
 ### 3.6 HTML Reporting Layer
 
 - **Jinja2**: HTML template rendering
-- **ECharts**: Chart rendering
+- **Local JavaScript + SVG renderer**: chart rendering inside the static report
 
 Reasons:
 
 - Jinja2 is well suited for generating static HTML reports
-- ECharts is strong at timelines, rankings, heatmaps, and bar charts
+- A local renderer keeps the report fully offline and self-contained when opened directly from the file system
+- The chart payload remains reusable, so a future ECharts-based renderer can be introduced without changing the analysis pipeline
 
 ### 3.7 Testing
 
@@ -455,7 +456,9 @@ The MVP should use:
 
 1. Python to generate `report.json`
 2. Python to generate the base HTML shell
-3. Front-end scripts to read the JSON and render charts and tables
+3. Front-end scripts to read the report payload and render charts and tables
+
+For local `file://` compatibility, `index.html` may embed the same payload that is written to `report.json`, as long as `report.json` remains the canonical machine-readable report output.
 
 Benefits of this approach:
 

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>GitScope Report</title>
+    <link rel="stylesheet" href="assets/report.css">
+  </head>
+  <body>
+    <div class="layout">
+      <aside class="sidebar">
+        <div class="brand">
+          <span class="brand-mark">GS</span>
+          <div>
+            <div class="brand-title">GitScope</div>
+            <div class="brand-subtitle">Static repository report</div>
+          </div>
+        </div>
+        <nav id="sidebar-nav" class="sidebar-nav"></nav>
+      </aside>
+      <main class="content">
+        <header id="report-header" class="page-header"></header>
+        <section id="overview-shell" class="overview-shell"></section>
+        <div id="sections-root" class="sections-root"></div>
+      </main>
+    </div>
+
+    <script id="report-data" type="application/json">{{ report_json | safe }}</script>
+    <script src="assets/report.js"></script>
+  </body>
+</html>

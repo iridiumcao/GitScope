@@ -314,6 +314,7 @@ Git 2.30+
 - Analysis modules should be independently extensible
 - The output data model should remain as stable as possible
 - The CLI, analysis layer, and reporting layer should be decoupled
+- Behavior-changing code updates must update the related documentation in the same task so requirements, design, and implementation stay aligned
 
 ### 8.5 Extensibility
 
